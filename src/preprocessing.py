@@ -4,9 +4,12 @@ import pandas as pd
 import numpy as np
 from transformers import AutoTokenizer
 
-def load_codiesp_labels(train_path, top_n=50):
-    """Load diagnosis labels and restrict to top-N most frequent codes."""
-    diag_labels = pd.read_csv(os.path.join(train_path, 'trainD.tsv'), sep='\t', header=None)
+def load_codiesp_labels(split_path, split_name, top_n=50):
+    """Load diagnosis labels and restrict to top-N most frequent codes.
+    split_name should be 'train', 'dev', or 'test' -- used to build the correct filename.
+    """
+    label_file = f"{split_name}D.tsv"
+    diag_labels = pd.read_csv(os.path.join(split_path, label_file), sep='\t', header=None)
     diag_labels.columns = ['doc_id', 'code']
     code_counts = diag_labels['code'].value_counts()
     top_codes = set(code_counts.head(top_n).index.tolist())
@@ -25,9 +28,9 @@ def build_label_matrix(diag_labels, top_codes):
         label_matrix.append(row)
     return np.array(label_matrix), valid_doc_ids, top_list
 
-def load_documents(train_path, valid_doc_ids):
+def load_documents(split_path, valid_doc_ids):
     """Load English clinical note text for each valid document."""
-    notes_folder = os.path.join(train_path, 'text_files_en')
+    notes_folder = os.path.join(split_path, 'text_files_en')
     documents_text = []
     for doc_id in valid_doc_ids:
         file_path = os.path.join(notes_folder, doc_id + '.txt')
