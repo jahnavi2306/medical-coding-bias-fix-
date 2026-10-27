@@ -39,7 +39,7 @@ def load_documents(split_path, valid_doc_ids):
     return documents_text
 
 def chunk_document(text, tokenizer, chunk_size=128, max_chunks=25):
-    """Split long documents into overlapping token chunks to avoid truncation."""
+    """Split long documents into consecutive, non-overlapping token chunks to avoid truncation."""
     tokens = tokenizer.encode(text, add_special_tokens=False)
     chunks = []
     for i in range(0, len(tokens), chunk_size):
